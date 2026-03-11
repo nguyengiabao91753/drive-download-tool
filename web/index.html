@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Drive PDF Downloader</title>
+
+<style>
+
+body{
+ font-family:Arial;
+ padding:20px;
+}
+
+input{
+ width:100%;
+ padding:12px;
+}
+
+button{
+ width:100%;
+ padding:14px;
+ margin-top:10px;
+}
+
+#log{
+ margin-top:20px;
+ background:#111;
+ color:#0f0;
+ padding:10px;
+ height:300px;
+ overflow:auto;
+ font-family:monospace;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Drive PDF Downloader</h2>
+
+<input id="url" placeholder="Paste Drive URL">
+
+<button onclick="download()">Download</button>
+
+<div id="log"></div>
+
+<script>
+
+function addLog(t){
+
+ const log=document.getElementById("log")
+
+ log.innerHTML+=t+"<br>"
+
+ log.scrollTop=log.scrollHeight
+
+}
+
+async function download(){
+
+ document.getElementById("log").innerHTML=""
+
+ const url=document.getElementById("url").value
+
+ addLog("Sending request...")
+
+ const r=await fetch("/download",{
+  method:"POST",
+  headers:{
+   "Content-Type":"application/json"
+  },
+  body:JSON.stringify({url})
+ })
+
+ const data=await r.json()
+
+ data.log.forEach(addLog)
+
+ if(!data.success){
+
+  addLog("Download failed")
+
+  return
+ }
+
+ addLog("Preparing download...")
+
+ const binary=atob(data.pdf)
+
+ const arr=new Uint8Array(binary.length)
+
+ for(let i=0;i<binary.length;i++)
+  arr[i]=binary.charCodeAt(i)
+
+ const blob=new Blob([arr],{type:"application/pdf"})
+
+ const a=document.createElement("a")
+
+ a.href=URL.createObjectURL(blob)
+
+ a.download="drive.pdf"
+
+ a.click()
+
+ addLog("Download completed")
+
+}
+
+</script>
+
+</body>
+</html>
