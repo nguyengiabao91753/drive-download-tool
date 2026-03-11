@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: drive-pdf-tool
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
