@@ -18,13 +18,15 @@ app.post("/download", async (req,res)=>{
  logs.push("Launching browser")
 
  const browser = await puppeteer.launch({
- headless: "new",
- args: [
-  "--no-sandbox",
-  "--disable-setuid-sandbox",
-  "--disable-dev-shm-usage",
-  "--disable-gpu"
- ]
+  headless: "new",
+  executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
+  args: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--single-process"
+  ]
 })
 
  const page = await browser.newPage()

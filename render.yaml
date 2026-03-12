@@ -1,6 +1,9 @@
 services:
   - type: web
-    name: drive-pdf-tool
+    name: drive-download-tool
     env: node
     buildCommand: npm install
     startCommand: node server.js
+    envVars:
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/.cache/puppeteer
