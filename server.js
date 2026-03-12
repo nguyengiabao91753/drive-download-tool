@@ -1,3 +1,21 @@
+const { execSync } = require("child_process")
+const fs = require("fs")
+
+const chromePath = "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome"
+
+if (!fs.existsSync(chromePath)) {
+  console.log("Chrome not found, installing...")
+  execSync("npx puppeteer browsers install chrome", { 
+    stdio: "inherit",
+    env: {
+      ...process.env,
+      PUPPETEER_CACHE_DIR: "/opt/render/.cache/puppeteer"
+    }
+  })
+  console.log("Chrome installed!")
+}
+
+
 const express = require("express")
 const puppeteer = require("puppeteer")
 const { PDFDocument } = require("pdf-lib")
