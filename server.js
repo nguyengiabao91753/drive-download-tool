@@ -46,9 +46,23 @@ app.post("/download", async (req, res) => {
     })
 
     const page = await browser.newPage()
+
+    // Tăng timeout mặc định
+    page.setDefaultNavigationTimeout(120000)
+    page.setDefaultTimeout(120000)
+
+    // Giả lập browser thật để tránh bị Google chặn
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+    )
+    await page.setViewport({ width: 1280, height: 800 })
+
     logs.push("Opening Drive")
 
-    await page.goto(url, { waitUntil: "networkidle2" })
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 })
+
+    // Chờ thêm để trang load ổn định
+    await new Promise(r => setTimeout(r, 3000))
 
     // Lấy tên tài liệu từ title trang
     const docTitle = await page.title()
@@ -77,7 +91,7 @@ app.post("/download", async (req, res) => {
 
       logs.push("Fetching file directly...")
 
-      const pdfResponse = await page.goto(directUrl, { waitUntil: "networkidle2" })
+      const pdfResponse = await page.goto(directUrl, { waitUntil: "networkidle2", timeout: 120000 })
       const contentType = pdfResponse.headers()["content-type"] || ""
 
       if (!contentType.includes("pdf")) {
