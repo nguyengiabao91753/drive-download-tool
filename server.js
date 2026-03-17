@@ -52,6 +52,15 @@ app.post("/download", async (req,res)=>{
 
  logs.push("Opening Drive")
 
+ const docTitle = await page.title()
+const fileName = docTitle
+  .replace(/\s*-\s*Google Drive\s*$/i, "")  // bỏ " - Google Drive" ở cuối
+  .trim()
+  .replace(/[\\/:*?"<>|]/g, "_")            // thay ký tự không hợp lệ
+  || "drive"
+
+logs.push("Document: " + fileName)
+
  await page.goto(url,{waitUntil:"networkidle2"})
 
  await page.waitForSelector(".ndfHFb-c4YZDc-cYSp0e-DARUcf",{timeout:15000})
@@ -136,9 +145,11 @@ app.post("/download", async (req,res)=>{
  logs.push("ERROR: "+e.message)
 
  res.json({
-  success:false,
-  log:logs
- })
+  success: true,
+  log: logs,
+  fileName: fileName,          // ← thêm dòng này
+  pdf: Buffer.from(pdfBytes).toString("base64")
+})
 
  }
 
